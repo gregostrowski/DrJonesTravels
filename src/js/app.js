@@ -6,7 +6,7 @@ let app = (function (mapboxgl) {
         _audio,
         _inTransit = false, //are we flying?
         _stepsBetweenPoints = 50, //# of points we'll add between locations
-        _timeBetweenSteps = 50; //how quickly we fly
+        _timeBetweenSteps = 150; //how quickly we fly
 
     //initializer
     pub.init = () => {
@@ -68,7 +68,7 @@ let app = (function (mapboxgl) {
         
         //add new list item on UI
         $("#locations").append("<li>" + result.result.text + "</li>");
-        
+        addMarker(result);
         //clear geocoder text of previous search
         _geocoder._clear();
     }
@@ -76,6 +76,31 @@ let app = (function (mapboxgl) {
     //get the Lat/Lng from a geocode object
     function getLatLngFromPoint(point) {
         return [point.result.center[0], point.result.center[1]];
+    }
+    
+    function addMarker(point) {
+        let srcName = "pt" + point.result.id;
+        if(!_map.getSource(srcName)){
+            _map.addSource(srcName, {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            });
+
+            _map.addLayer({
+                "id": srcName,
+                "source": srcName,
+                "type": "circle",
+                "paint": {
+                    "circle-radius": 7,
+                    "circle-color": "red"
+                }
+            });
+            
+            _map.getSource(srcName).setData(point.result.geometry);
+        }
     }
 
     //Generates array of points that create a line between two points
@@ -164,7 +189,7 @@ let app = (function (mapboxgl) {
                 if(i === route.length -1) {
                     _inTransit = false;
                 }
-            }, _timeBetweenSteps + i * 180);
+            }, _timeBetweenSteps * i );
         }
         
         _map.addLayer({
