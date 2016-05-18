@@ -1,0 +1,64 @@
+body { margin:0; padding:0; font-family: Courier New, Courier, monospace; }
+#map { position:absolute; top:0; bottom:0; width:100%; }
+.locations-container {
+    position: absolute;
+    top: 60px;
+    left: 10px;
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+    border-radius: 3px;
+    padding: 15px;
+    max-width: 325px;
+}
+h4, p { margin: 0; }
+#locations li {
+    animation: flash-red 1s;
+}
+.btn {
+    font-family: Courier New;
+    border: none;
+    border-radius: 3px;
+    padding: 15px 30px;
+    outline: none;
+    cursor: pointer;
+    color: #333;
+    font-weight: bold;
+    position: relative;
+    background: #ccc;
+    box-shadow: 0 6px #666;
+    text-transform: uppercase;
+}
+.btn:hover {
+    box-shadow: 0 4px #666;
+    top: 4px;
+}
+.btn:active {
+    box-shadow: 0 0 #666;
+    top: 6px;
+}
+.btn[disabled] {
+    opacity: .6;
+    cursor: auto;
+}
+.btn[disabled]:hover {
+    box-shadow: 0 6px #666;
+    top: 0;
+}
+.marker-circle {
+    border-radius: 100%;
+    color: red;
+    width: 10px;
+    height: 10px;
+}
+input[type="checkbox"] {
+    vertical-align: middle;
+}
+
+@keyframes flash-red {
+    0% {
+        color: red;
+    }
+    100% {
+        color: black;
+    }
+}
