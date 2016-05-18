@@ -5,7 +5,7 @@ let app = (function (mapboxgl) {
         _locations = [], //array to keep our destination locations
         _audio,
         _inTransit = false, //are we flying?
-        _stepsBetweenPoints = 25, //# of points we'll add between locations
+        _stepsBetweenPoints = 50, //# of points we'll add between locations
         _timeBetweenSteps = 50; //how quickly we fly
 
     //initializer
