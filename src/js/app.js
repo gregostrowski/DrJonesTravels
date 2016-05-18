@@ -19,7 +19,7 @@ let app = (function (mapboxgl) {
         mapboxgl.accessToken = 'pk.eyJ1Ijoib25ldGhydTIiLCJhIjoiY2lvOWNtMGkxMDMyNHY2a3FpMWZtejRvbCJ9.fvCj4Thw_6POMXE8FoMPWw';
         _map = new mapboxgl.Map({
             container: 'map', // container id
-            style: 'mapbox://styles/onethru2/ciodcjqry002btbmfiap0y5ue', //'mapbox://styles/mapbox/bright-v9', //stylesheet location
+            style: 'mapbox://styles/mapbox/bright-v9', //stylesheet location
             center: [-98, 40], // starting position
             zoom: 4 // starting zoom
         });
