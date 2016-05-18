@@ -39,6 +39,7 @@ let app = (function (mapboxgl) {
     function uiSetup() {
         //sweet tunes
         _audio = new Audio('IndianaJones.mp3');
+        _audio.volume = .2;
         
         //button to go
         $(".play-route").click(() => {
