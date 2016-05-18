@@ -3,6 +3,7 @@ let app = (function (mapboxgl) {
         _map,
         _geocoder,
         _locations = [], //array to keep our destination locations
+        _layers = [],
         _audio,
         _inTransit = false, //are we flying?
         _stepsBetweenPoints = 50, //# of points we'll add between locations
@@ -58,9 +59,18 @@ let app = (function (mapboxgl) {
             }
         });
     }
+    
+    function clearMap() {
+        for(let layer of _layers) {
+            _map.removeLayer(layer);
+            _map.removeSource(layer);
+        }
+        _layers = [];
+    }
 
     //capture geocode callback, add object to locations
     function geoQueryCallback(result) {
+        result.xy = getLatLngFromPoint(result); //make lat/lng easy to access for comparisons
         _locations.push(result);
         if(_locations.length >= 2) {
             $(".play-route").prop('disabled', false);
@@ -68,7 +78,6 @@ let app = (function (mapboxgl) {
         
         //add new list item on UI
         $("#locations").append("<li>" + result.result.text + "</li>");
-        addMarker(result);
         //clear geocoder text of previous search
         _geocoder._clear();
     }
@@ -100,6 +109,7 @@ let app = (function (mapboxgl) {
             });
             
             _map.getSource(srcName).setData(point.result.geometry);
+            _layers.push(srcName);
         }
     }
 
@@ -133,9 +143,6 @@ let app = (function (mapboxgl) {
                 break;
             } else {
                 route = route.concat(getLineFromPoints(obj, _locations[i + 1], _stepsBetweenPoints));
-                if(i+1 < _locations.length && _locations.length > 2) {
-                    route.pop(); //get rid of duplicates if we're creating a+b, b+c, we'll have 2 'b' points
-                }
             }
         };
 
@@ -149,15 +156,16 @@ let app = (function (mapboxgl) {
         } 
         //lets go again, can't have duplicate source/layers
         if(_map.getLayer("route")) {
-            _map.removeLayer("route");
-            _map.removeSource("route");
+            clearMap();
         }
         _inTransit = true;
         
         //total route planned
-        let route = convertPointsToRoute();
+        let route = uniqueArray(convertPointsToRoute());
         //starting points, we add points from route to routeTraveled as we travel
         let routeTraveled = [route.shift(), route.shift()];
+        //add first point marker
+        addMarker(getLocationfromLatLng(routeTraveled[0]));
         
         //setup map to first point
         _map.zoomTo(6);
@@ -186,6 +194,12 @@ let app = (function (mapboxgl) {
                 routeTraveled.push(point);
                 source.setData(data);                
                 _map.setCenter(point);
+                
+                let loc = getLocationfromLatLng(point);
+                if(loc) {
+                    addMarker(loc);
+                }
+                
                 if(i === route.length -1) {
                     _inTransit = false;
                 }
@@ -205,12 +219,28 @@ let app = (function (mapboxgl) {
                 "line-width": 6
             }
         });
+        _layers.push("route");
     };
     
     //Linear Interpolation for finding points on a line
     function linearInterpolation(start, end, percentage) {
         return start + (end - start) * percentage;
-    }    
+    }
+    
+    function getLocationfromLatLng(point) {
+        for(let loc of _locations) {
+            if(point.toString() === loc.xy.toString()) {
+                return loc;
+            }
+        }
+    }
+    
+    function uniqueArray(a) {
+        let seen = {};
+        return a.filter((item) => {
+            return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+        });
+    }
     
     //Generator function so we can use for..of and have an index
     function* enumerate(iterable) {
