@@ -1,0 +1,27 @@
+{
+  "name": "DrJonesTravels",
+  "version": "0.0.0",
+  "description": "Using Mapbox GL to create a Dr. Indiana Jones Travel Simulator as seen in the movies.  \r Add locations, press the button, and fly in style.  \r [Demo](http://gregostrowski.github.io/DrJonesTravels/)",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gregostrowski/DrJonesTravels.git"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/gregostrowski/DrJonesTravels/issues"
+  },
+  "homepage": "https://github.com/gregostrowski/DrJonesTravels",
+  "devDependencies": {
+    "gulp": "~3.9.1",
+    "gulp-uglify": "~1.5.3",
+    "gulp-util": "~3.0.7",
+    "gulp-babel": "~6.1.2",
+    "babel-preset-es2015": "~6.9.0",
+    "babel-polyfill": "~6.9.0"
+  }
+}
