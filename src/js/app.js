@@ -6,8 +6,7 @@ let app = (function (mapboxgl) {
         _layers = [],
         _audio,
         _inTransit = false, //are we flying?
-        _stepsBetweenPoints = 50, //# of points we'll add between locations
-        _timeBetweenSteps = 150; //how quickly we fly
+        _stepsBetweenPoints = 200; //# of points we'll add between locations
 
     //initializer
     pub.init = () => {
@@ -20,7 +19,7 @@ let app = (function (mapboxgl) {
         mapboxgl.accessToken = 'pk.eyJ1Ijoib25ldGhydTIiLCJhIjoiY2lvOWNtMGkxMDMyNHY2a3FpMWZtejRvbCJ9.fvCj4Thw_6POMXE8FoMPWw';
         _map = new mapboxgl.Map({
             container: 'map', // container id
-            style: 'mapbox://styles/onethru2/ciodcjqry002btbmfiap0y5ue', //'mapbox://styles/mapbox/bright-v9', //stylesheet location
+            style: 'mapbox://styles/onethru2/ciofwmylr003saimaiv2cg5ud', 
             center: [-98, 40], // starting position
             zoom: 4 // starting zoom
         });
@@ -112,6 +111,11 @@ let app = (function (mapboxgl) {
             _layers.push(srcName);
         }
     }
+    
+    //Linear Interpolation for finding points on a line
+    function linearInterpolation(start, end, percentage) {
+        return start + (end - start) * percentage;
+    }
 
     //Generates array of points that create a line between two points
     // param: a => starting point
@@ -134,7 +138,7 @@ let app = (function (mapboxgl) {
         line.push(bLL); // add last point
         return line;
     }
-    
+        
     //Loop over all points and create our entire route of lines
     function convertPointsToRoute() {       
         let route = [];
@@ -181,31 +185,6 @@ let app = (function (mapboxgl) {
         };
         let source = new mapboxgl.GeoJSONSource({ data: data });
         _map.addSource("route", source);
-        
-        //start the sweet music
-        if(document.getElementById("music").checked) {
-            _audio.play();
-        }
-        
-        //add the points in the route
-        for (const [i, point] of enumerate(route)) {
-            //add delay to mimic the flying animation
-            setTimeout(function () {
-                routeTraveled.push(point);
-                source.setData(data);                
-                _map.setCenter(point);
-                
-                let loc = getLocationfromLatLng(point);
-                if(loc) {
-                    addMarker(loc);
-                }
-                
-                if(i === route.length -1) {
-                    _inTransit = false;
-                }
-            }, _timeBetweenSteps * i );
-        }
-        
         _map.addLayer({
             "id": "route",
             "type": "line",
@@ -220,13 +199,40 @@ let app = (function (mapboxgl) {
             }
         });
         _layers.push("route");
+        
+        //start the sweet music
+        if(document.getElementById("music").checked) {
+            _audio.play();
+        }
+
+        let counter = 0;
+        animate();
+        
+        //new animate function that uses requestAnimationFrame function
+        function animate() {
+            let point = route[counter];
+            routeTraveled.push(point);
+            source.setData(data);                
+            _map.setCenter(point);
+            
+            //if we hit one of our locations, add a dot marker
+            let loc = getLocationfromLatLng(point);
+            if(loc) {
+                addMarker(loc);
+            }
+
+            // Request the next frame of animation so long as destination has not
+            // been reached.
+            if (counter !== route.length -1) {
+                requestAnimationFrame(animate);
+            } else {
+                _inTransit = false;
+            }
+
+            counter = counter + 1;
+        }
     };
-    
-    //Linear Interpolation for finding points on a line
-    function linearInterpolation(start, end, percentage) {
-        return start + (end - start) * percentage;
-    }
-    
+
     function getLocationfromLatLng(point) {
         for(let loc of _locations) {
             if(point.toString() === loc.xy.toString()) {
