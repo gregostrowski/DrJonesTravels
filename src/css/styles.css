@@ -10,6 +10,13 @@ body { margin:0; padding:0; font-family: Courier New, Courier, monospace; }
     padding: 15px;
     max-width: 325px;
 }
+.locations-container label {
+    cursor: pointer;
+}
+.locations-container input[type="checkbox"] {
+    vertical-align: middle;
+    cursor: pointer;
+}
 h4, p { margin: 0; }
 #locations li {
     animation: flash-red 1s;
@@ -50,9 +57,7 @@ h4, p { margin: 0; }
     width: 10px;
     height: 10px;
 }
-input[type="checkbox"] {
-    vertical-align: middle;
-}
+
 
 @keyframes flash-red {
     0% {
