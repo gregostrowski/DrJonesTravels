@@ -69,7 +69,7 @@ let app = (function (mapboxgl) {
 
     //capture geocode callback, add object to locations
     function geoQueryCallback(result) {
-        result.xy = getLatLngFromPoint(result); //make lat/lng easy to access for comparisons
+        result.xy = getCoords(result); //make lat/lng easy to access for comparisons
         _locations.push(result);
         if(_locations.length >= 2) {
             $(".play-route").prop('disabled', false);
@@ -81,9 +81,9 @@ let app = (function (mapboxgl) {
         _geocoder._clear();
     }
 
-    //get the Lat/Lng from a geocode object
-    function getLatLngFromPoint(point) {
-        return [point.result.center[0], point.result.center[1]];
+    //get the Lat/Lng from a geocode point object
+    function getCoords(point) {
+        return Array.isArray(point) ? point : point.result.geometry.coordinates;
     }
     
     function addMarker(point) {
@@ -121,15 +121,16 @@ let app = (function (mapboxgl) {
     // param: a => starting point
     // param: b => ending point
     // param: stepCount => number of points in line
-    function getLineFromPoints(a, b, stepCount) {
-        const aLL = getLatLngFromPoint(a);
-        const bLL = getLatLngFromPoint(b);
-        let line = [aLL]; //add first point
+    function getLineFromPoints(a, b) {
+        const aLL = getCoords(a);
+        const bLL = getCoords(b);
         
-        
-        let stepPerc = Number((1 / stepCount).toFixed(4)); //The progress. It is given in percentage, between 0 and 1.
+        let stepPerc = Number((1 / _stepsBetweenPoints).toFixed(4)); //The progress. It is given in percentage, between 0 and 1.
         let stepIter = stepPerc;
-        for(let i = 0; i < stepCount; i++) {
+        
+        let line = [aLL]; //add first point        
+
+        for(let i = 0; i < _stepsBetweenPoints; i++) {
             //create new point
             let temp = [ linearInterpolation(aLL[0], bLL[0], stepIter), linearInterpolation(aLL[1], bLL[1], stepIter) ];
             line.push(temp); // push it along
@@ -146,7 +147,7 @@ let app = (function (mapboxgl) {
             if (_locations.length <= i + 1) {
                 break;
             } else {
-                route = route.concat(getLineFromPoints(obj, _locations[i + 1], _stepsBetweenPoints));
+                route = route.concat(getLineFromPoints(obj, _locations[i + 1]));
             }
         };
 
